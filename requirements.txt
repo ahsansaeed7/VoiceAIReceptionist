@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+sqlalchemy
+alembic
+psycopg2-binary
+pgvector
+websockets
+httpx
+python-dotenv
+resend

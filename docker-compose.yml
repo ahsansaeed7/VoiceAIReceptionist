@@ -1,0 +1,23 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: voice_receptionist_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: voice_agent
+      POSTGRES_PASSWORD: voiceagent123
+      POSTGRES_DB: voice_receptionist_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: voice_receptionist_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
+volumes:
+  pgdata:
