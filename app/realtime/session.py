@@ -26,7 +26,20 @@ from app.agent.tools import TOOL_SCHEMAS, TOOL_FUNCTIONS
 REALTIME_URL = "wss://api.openai.com/v1/realtime?model=gpt-realtime"
 
 
-async def run_session(audio_in_queue: asyncio.Queue, audio_out_queue: asyncio.Queue):
+async def run_session(
+    audio_in_queue: asyncio.Queue,
+    audio_out_queue: asyncio.Queue,
+    audio_format: dict = None,
+):
+    """
+    audio_format defaults to mic_test's PCM16/24kHz. For telephony, pass
+    {"type": "audio/pcmu"} instead — OpenAI's Realtime API accepts G.711
+    mu-law directly, so Telnyx's native phone audio can be piped straight
+    through with no resampling/transcoding needed.
+    """
+    if audio_format is None:
+        audio_format = {"type": "audio/pcm", "rate": 24000}
+
     headers = {
         "Authorization": f"Bearer {OPENAI_API_KEY}",
     }
@@ -41,11 +54,11 @@ async def run_session(audio_in_queue: asyncio.Queue, audio_out_queue: asyncio.Qu
                 "instructions": SYSTEM_PROMPT,
                 "audio": {
                     "input": {
-                        "format": {"type": "audio/pcm", "rate": 24000},
+                        "format": audio_format,
                         "turn_detection": {"type": "server_vad"},
                     },
                     "output": {
-                        "format": {"type": "audio/pcm", "rate": 24000},
+                        "format": audio_format,
                         "voice": "marin",
                     },
                 },
